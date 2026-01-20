@@ -70,7 +70,7 @@ const daysCountInMonth = computed(() => {
 });
 
 /**
- * First day of the week it the month.
+ * First day of the week in the month.
  * 1 = monday
  * 7 = sunday
  */
