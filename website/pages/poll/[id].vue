@@ -11,7 +11,9 @@ const route = useRoute();
 const id = route.params.id;
 
 // Fetch poll
-const { data: poll } = await useFetch<PollApiResponse>(`/api/polls/${id}`);
+const { data: poll, refresh: refreshVotes } = await useFetch<PollApiResponse>(
+  `/api/polls/${id}`,
+);
 
 if (!poll.value) {
   throw createError({
@@ -43,6 +45,7 @@ async function submitVote(payload: VotePollFormData) {
   try {
     if (poll.value) {
       await votePoll(poll.value.publicUid, payload);
+      await refreshVotes();
       showConfirmation.value = true;
       await nextTick();
       confirmationRef.value?.focus();
