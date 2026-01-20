@@ -404,5 +404,7 @@ describe("Poll vote page", () => {
     cy.contains("Voter").click();
 
     cy.contains("Votre vote a bien été pris en compte !");
+    cy.get(".respondent:not(.maybe)").contains("Jane");
+    cy.get(".respondent.maybe").contains("Jane");
   });
 });
