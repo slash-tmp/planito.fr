@@ -69,8 +69,15 @@ const daysCountInMonth = computed(() => {
   return 32 - new Date(selectedYear.value, selectedMonth.value, 32).getDate();
 });
 
+/**
+ * First day of the week in the month.
+ * 1 = monday
+ * 7 = sunday
+ */
 const firstDayOfMonth = computed(() => {
-  return new Date(selectedYear.value, selectedMonth.value).getDay();
+  const d = new Date(selectedYear.value, selectedMonth.value).getDay();
+  // getDays returns 0-6 (0=sunday), we replace 0 with 7 for sunday
+  return d === 0 ? 7 : d;
 });
 
 const monthDays = computed(() => {
