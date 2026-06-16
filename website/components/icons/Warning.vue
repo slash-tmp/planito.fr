@@ -1,31 +1,11 @@
 <template>
   <svg
-    width="100%"
-    height="100%"
-    stroke-width="1.5"
-    viewBox="0 0 24 24"
-    fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    color="currentColor"
+    viewBox="0 0 24 24"
+    fill="currentColor"
   >
     <path
-      d="M20.0429 21H3.95705C2.41902 21 1.45658 19.3364 2.22324 18.0031L10.2662 4.01533C11.0352 2.67792 12.9648 2.67791 13.7338 4.01532L21.7768 18.0031C22.5434 19.3364 21.581 21 20.0429 21Z"
-      stroke="currentColor"
-      stroke-width="1.5"
-      stroke-linecap="round"
-    ></path>
-    <path
-      d="M12 9V13"
-      stroke="currentColor"
-      stroke-width="1.5"
-      stroke-linecap="round"
-    ></path>
-    <path
-      d="M12 17.01L12.01 16.9989"
-      stroke="currentColor"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      d="M12.8659 3.00017L22.3922 19.5002C22.6684 19.9785 22.5045 20.5901 22.0262 20.8662C21.8742 20.954 21.7017 21.0002 21.5262 21.0002H2.47363C1.92135 21.0002 1.47363 20.5525 1.47363 20.0002C1.47363 19.8246 1.51984 19.6522 1.60761 19.5002L11.1339 3.00017C11.41 2.52187 12.0216 2.358 12.4999 2.63414C12.6519 2.72191 12.7782 2.84815 12.8659 3.00017ZM4.20568 19.0002H19.7941L11.9999 5.50017L4.20568 19.0002ZM10.9999 16.0002H12.9999V18.0002H10.9999V16.0002ZM10.9999 9.00017H12.9999V14.0002H10.9999V9.00017Z"
     ></path>
   </svg>
 </template>

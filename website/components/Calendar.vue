@@ -451,6 +451,10 @@ const nextDatesCount = computed((): string => {
         width: var(--header-nav-button-size);
         height: var(--header-nav-button-size);
 
+        svg {
+          width: 100%;
+        }
+
         @media (width <= 22rem) {
           --header-nav-button-size: 2rem;
         }

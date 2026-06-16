@@ -90,7 +90,7 @@ const model = defineModel<string>();
     display: none;
 
     @media (width < 30rem) {
-      display: initial;
+      display: flex;
     }
   }
 }

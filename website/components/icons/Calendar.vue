@@ -1,40 +1,11 @@
 <template>
   <svg
-    width="100%"
-    height="100%"
-    stroke-width="1.5"
-    viewBox="0 0 24 24"
-    fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    color="currentColor"
+    viewBox="0 0 24 24"
+    fill="currentColor"
   >
     <path
-      d="M15 4V2M15 4V6M15 4H10.5M3 10V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V10H3Z"
-      stroke="currentColor"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    ></path>
-    <path
-      d="M3 10V6C3 4.89543 3.89543 4 5 4H7"
-      stroke="currentColor"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    ></path>
-    <path
-      d="M7 2V6"
-      stroke="currentColor"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    ></path>
-    <path
-      d="M21 10V6C21 4.89543 20.1046 4 19 4H18.5"
-      stroke="currentColor"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"
     ></path>
   </svg>
 </template>
