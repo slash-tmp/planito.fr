@@ -333,6 +333,13 @@ export default {
         },
         errorAlert:
           "Un problème empêche la soumission du sondage. Contactez-nous à l’adresse @:email si le problème persiste.",
+        alreadyVotedAlert: {
+          intro:
+            "Il semble que vous ayez déjà répondu à ce sondage. Pour en être sûr,",
+          contactAdmin: "contactez {admin}.",
+          checkVotesAndContactAdmin:
+            "consultez les votes ou contactez {admin}.",
+        },
       },
     },
   },

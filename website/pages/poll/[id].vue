@@ -145,7 +145,26 @@ function saveVoteToLocalStorage() {
           type="warning"
           class="already-voted-alert"
         >
-          <p>Vous avez déjà répondu à ce sondage.</p>
+          <p>
+            {{ $t("pages.poll.id.alreadyVotedAlert.intro") }}
+            <template v-if="poll.hideVotes">
+              {{
+                $t("pages.poll.id.alreadyVotedAlert.contactAdmin", {
+                  admin: poll.adminName || "l’administrateur du sondage",
+                })
+              }}
+            </template>
+            <template v-else>
+              {{
+                $t(
+                  "pages.poll.id.alreadyVotedAlert.checkVotesAndContactAdmin",
+                  {
+                    admin: poll.adminName || "l’administrateur du sondage",
+                  },
+                )
+              }}
+            </template>
+          </p>
         </Alert>
       </ClientOnly>
 
