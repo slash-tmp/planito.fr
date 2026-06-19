@@ -208,7 +208,7 @@ describe("Poll admin page", () => {
     cy.contains('Le sondage "Trip to the museum" a bien été supprimé');
   });
 
-  it("displays choices with respondents and best choice(s)", () => {
+  it("displays choices with respondents, best choice(s) and never available", () => {
     // 2 dates with 3 choices
     cy.get('h2:contains("Réponses et participations") + ul > li')
       .its("length")
@@ -223,6 +223,9 @@ describe("Poll admin page", () => {
 
     // 1 best choices
     cy.get('mark:contains("Meilleur choix")').its("length").should("eq", 1);
+
+    // 1 never available
+    cy.contains("A répondu mais n’est disponible à aucune date : Marie.");
   });
 });
 
