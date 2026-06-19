@@ -107,8 +107,8 @@ const neverAvailableRespondents = computed(() => {
   <p v-if="isAdmin && neverAvailableRespondents.length" class="never-available">
     {{
       neverAvailableRespondents.length > 1
-        ? "Ont répondu mais ne sont disponibles à aucune date :"
-        : "A répondu mais n’est disponible à aucune date :"
+        ? $t("pages.poll.admin.id.responses.neverAvailable.plural")
+        : $t("pages.poll.admin.id.responses.neverAvailable.singular")
     }}
     <template v-for="(respondent, i) in neverAvailableRespondents" :key="i">
       <strong>{{ respondent }}</strong
@@ -117,7 +117,7 @@ const neverAvailableRespondents = computed(() => {
         i === neverAvailableRespondents.length - 1
           ? ""
           : i === neverAvailableRespondents.length - 2
-            ? " et "
+            ? ` ${$t("pages.poll.admin.id.responses.neverAvailable.and")} `
             : ", "
       }}</template
     >.

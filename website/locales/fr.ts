@@ -225,6 +225,11 @@ export default {
             vote: "vote | votes",
             maybe: "(peut-être)",
             bestChoice: "Meilleur choix",
+            neverAvailable: {
+              singular: "A répondu mais n’est disponible à aucune date :",
+              plural: "Ont répondu mais ne sont disponibles à aucune date :",
+              and: "et",
+            },
           },
           error: {
             404: {
