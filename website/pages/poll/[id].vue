@@ -82,8 +82,6 @@ const hasAlreadyVoted = computed(() => {
 });
 
 function saveVoteToLocalStorage() {
-  if (import.meta.server) return;
-
   const currentVotes = loadLocalStorageVotes();
 
   if (!hasAlreadyVoted.value) {
