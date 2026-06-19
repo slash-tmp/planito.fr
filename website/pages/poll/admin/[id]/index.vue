@@ -110,7 +110,11 @@ async function confirmDelete() {
       <Share :public-uid="poll.publicUid" />
     </div>
 
-    <Responses :choices="poll.choices" :respondents="poll.respondents" />
+    <Responses
+      is-admin
+      :choices="poll.choices"
+      :respondents="poll.respondents"
+    />
   </template>
 </template>
 

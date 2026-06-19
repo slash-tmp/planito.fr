@@ -7,6 +7,7 @@ import { type Respondent, Response } from "~/types/poll";
 const props = defineProps<{
   choices: { id: number; date: string }[];
   respondents: Respondent[];
+  isAdmin?: boolean;
 }>();
 
 const choicesWithRespondents = computed(() =>
@@ -37,6 +38,16 @@ const maxVotesResponseIds = computed((): number[] => {
       : r["MAYBE"] === firstBestResponse["MAYBE"],
   );
   return bestResponses.map((r) => r.id);
+});
+
+const neverAvailableRespondents = computed(() => {
+  return props.respondents
+    .filter((r) => {
+      return r.responses.every((re) => {
+        return re.value === Response.NO;
+      });
+    })
+    .map((r) => r.name);
 });
 </script>
 
@@ -93,6 +104,24 @@ const maxVotesResponseIds = computed((): number[] => {
       </ul>
     </li>
   </ul>
+  <p v-if="isAdmin && neverAvailableRespondents.length" class="never-available">
+    {{
+      neverAvailableRespondents.length > 1
+        ? "Ont répondu mais ne sont disponibles à aucune date :"
+        : "A répondu mais n’est disponible à aucune date :"
+    }}
+    <template v-for="(respondent, i) in neverAvailableRespondents" :key="i">
+      <strong>{{ respondent }}</strong
+      >{{
+        neverAvailableRespondents.length === 1 ||
+        i === neverAvailableRespondents.length - 1
+          ? ""
+          : i === neverAvailableRespondents.length - 2
+            ? " et "
+            : ", "
+      }}</template
+    >.
+  </p>
 </template>
 
 <style scoped>
@@ -199,5 +228,9 @@ const maxVotesResponseIds = computed((): number[] => {
     border-style: dashed;
     background-color: var(--color-background);
   }
+}
+
+.never-available {
+  margin-block-start: 1rem;
 }
 </style>
