@@ -381,6 +381,7 @@ describe("Poll vote page", () => {
         url: "http://localhost:4000/api/polls",
         body: fixture,
       }).then((data) => {
+        cy.wrap(data.body.publicUid).as("publicUid");
         cy.visit(`http://localhost:3000/poll/${data.body.publicUid}`);
       });
     });
@@ -406,5 +407,21 @@ describe("Poll vote page", () => {
     cy.contains("Votre vote a bien été pris en compte !");
     cy.get(".respondent:not(.maybe)").contains("Jane");
     cy.get(".respondent.maybe").contains("Jane");
+
+    cy.get("@publicUid").then((publicUid) => {
+      cy.getAllLocalStorage().then((storage) => {
+        expect(JSON.stringify(storage)).to.include(publicUid);
+      });
+    });
+  });
+
+  it("displays already voted alert if user already voted", () => {
+    cy.get<string>("@publicUid").then((publicUid) => {
+      window.localStorage.setItem("planito:votes", JSON.stringify([publicUid]));
+    });
+
+    cy.reload();
+
+    cy.contains("Il semble que vous ayez déjà répondu à ce sondage.");
   });
 });

@@ -49,6 +49,8 @@ async function submitVote(payload: VotePollFormData) {
       showConfirmation.value = true;
       await nextTick();
       confirmationRef.value?.focus();
+
+      saveVoteToLocalStorage();
     }
   } catch (e) {
     setToast({
@@ -59,6 +61,34 @@ async function submitVote(payload: VotePollFormData) {
     console.error(e);
   } finally {
     isLoading.value = false;
+  }
+}
+
+// Load and save votes to localStorage
+const LOCAL_STORAGE_KEY = "planito:votes";
+
+function loadLocalStorageVotes(): string[] {
+  if (import.meta.server) {
+    return [];
+  }
+
+  const rawVotes = localStorage.getItem(LOCAL_STORAGE_KEY);
+  return rawVotes ? JSON.parse(rawVotes) : [];
+}
+
+const hasAlreadyVoted = computed(() => {
+  const currentVotes = loadLocalStorageVotes();
+  return poll.value?.publicUid && currentVotes.includes(poll.value?.publicUid);
+});
+
+function saveVoteToLocalStorage() {
+  const currentVotes = loadLocalStorageVotes();
+
+  if (!hasAlreadyVoted.value) {
+    localStorage.setItem(
+      LOCAL_STORAGE_KEY,
+      JSON.stringify([...currentVotes, poll.value?.publicUid]),
+    );
   }
 }
 </script>
@@ -107,6 +137,35 @@ async function submitVote(payload: VotePollFormData) {
         </p>
       </Alert>
 
+      <ClientOnly>
+        <Alert
+          v-if="hasAlreadyVoted"
+          type="warning"
+          class="already-voted-alert"
+        >
+          <p>
+            {{ $t("pages.poll.id.alreadyVotedAlert.intro") }}
+            <template v-if="poll.hideVotes">
+              {{
+                $t("pages.poll.id.alreadyVotedAlert.contactAdmin", {
+                  admin: poll.adminName || "l’administrateur du sondage",
+                })
+              }}
+            </template>
+            <template v-else>
+              {{
+                $t(
+                  "pages.poll.id.alreadyVotedAlert.checkVotesAndContactAdmin",
+                  {
+                    admin: poll.adminName || "l’administrateur du sondage",
+                  },
+                )
+              }}
+            </template>
+          </p>
+        </Alert>
+      </ClientOnly>
+
       <VoteForm
         v-if="!showConfirmation"
         :choices="poll.choices"
@@ -141,6 +200,7 @@ async function submitVote(payload: VotePollFormData) {
 }
 
 .invitation-alert,
+.already-voted-alert,
 .confirmation-alert {
   margin-block-end: 2rem;
 }

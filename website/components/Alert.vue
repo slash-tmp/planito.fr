@@ -5,7 +5,7 @@ import Warning from "./icons/Warning.vue";
 import Xmark from "./icons/Xmark.vue";
 
 defineProps<{
-  type: "success" | "info" | "error";
+  type: "success" | "info" | "error" | "warning";
   isClosable?: boolean;
 }>();
 
@@ -26,6 +26,7 @@ const iconComponent = {
   success: CheckCircle,
   info: Info,
   error: Warning,
+  warning: Warning,
 };
 </script>
 
@@ -76,6 +77,11 @@ const iconComponent = {
   &.alert-error {
     --bg-color: var(--color-error-light);
     --border-color: var(--color-error);
+  }
+
+  &.alert-warning {
+    --bg-color: var(--color-warning-light);
+    --border-color: var(--color-warning);
   }
 
   .icon {

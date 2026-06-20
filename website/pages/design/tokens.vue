@@ -54,6 +54,10 @@ const stateSwatch = [
     name: "Error",
     colors: ["--color-error", "--color-error-light"],
   },
+  {
+    name: "Warning",
+    colors: ["--color-warning", "--color-warning-light"],
+  },
 ];
 
 const utilitySwatch = ["--color-outline"];

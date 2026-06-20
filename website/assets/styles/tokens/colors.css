@@ -56,6 +56,17 @@
   --color-error: hsl(var(--hue-error) 100% var(--luminosity-error));
   --color-error-light: hsl(var(--hue-error) 100% var(--luminosity-error-light));
 
+  /* Warning color */
+
+  /* hsl(31, 100%, 23.1%) */
+  --hue-warning: 40;
+  --luminosity-warning: 30%;
+  --luminosity-warning-light: 80%;
+  --color-warning: hsl(var(--hue-warning) 100% var(--luminosity-warning));
+  --color-warning-light: hsl(
+    var(--hue-warning) 100% var(--luminosity-warning-light)
+  );
+
   /* Utility colors */
   --luminosity-outline: 20%;
   --color-outline: hsl(var(--hue-primary) 75% var(--luminosity-outline));
@@ -89,6 +100,10 @@
     /* Error luminosity */
     --luminosity-error: 50%;
     --luminosity-error-light: 10%;
+
+    /* Warning luminosity */
+    --luminosity-warning: 60%;
+    --luminosity-warning-light: 20%;
 
     /* Utility luminosity */
     --luminosity-outline: 60%;
