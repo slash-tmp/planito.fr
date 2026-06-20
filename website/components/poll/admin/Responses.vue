@@ -104,22 +104,24 @@ const neverAvailableRespondents = computed(() => {
       </ul>
     </li>
   </ul>
-  <p v-if="isAdmin && neverAvailableRespondents.length" class="never-available">
+  <p v-if="neverAvailableRespondents.length" class="never-available">
     {{
-      neverAvailableRespondents.length > 1
-        ? $t("pages.poll.admin.id.responses.neverAvailable.plural")
-        : $t("pages.poll.admin.id.responses.neverAvailable.singular")
+      $t(
+        "pages.poll.admin.id.responses.neverAvailable",
+        neverAvailableRespondents.length,
+      )
     }}
-    <template v-for="(respondent, i) in neverAvailableRespondents" :key="i">
-      <strong>{{ respondent }}</strong
-      >{{
-        neverAvailableRespondents.length === 1 ||
-        i === neverAvailableRespondents.length - 1
-          ? ""
-          : i === neverAvailableRespondents.length - 2
-            ? ` ${$t("pages.poll.admin.id.responses.neverAvailable.and")} `
-            : ", "
-      }}</template
+
+    <template
+      v-for="(part, index) in formatList(neverAvailableRespondents, true)"
+      :key="index"
+    >
+      <strong v-if="part.type === 'element'">
+        {{ part.value }}
+      </strong>
+      <template v-else>
+        {{ part.value }}
+      </template> </template
     >.
   </p>
 </template>
