@@ -8,6 +8,7 @@ import { CreatePollDto } from './dto/create-poll.dto';
 import { PublicPoll } from './dto/public-poll.dto';
 import { RespondToPollDto } from './dto/respond-to-poll.dto';
 import { UpdatePollDto, UpdatePollDtoChoice } from './dto/update-poll.dto';
+import { UpdatePollResponseDto } from './dto/update-poll-response.dto';
 import { ChoiceDoesNotExistError } from './errors';
 import { CannotChangeChoiceDateError } from './errors/cannot-change-choice-date.error';
 import { DuplicateChoiceResponseError } from './errors/duplicate-choice-response.error';
@@ -154,6 +155,19 @@ export class PollsService {
     );
     if (!updatedPoll) return null;
     return this.rawPollToAdminPoll(updatedPoll);
+  }
+
+  async updatePollResponse(adminUid: string, data: UpdatePollResponseDto) {
+    const pollToUpdate = await this.pollRepository.findByAdminUid(adminUid);
+
+    if (!pollToUpdate) {
+      return null;
+    }
+
+    // TODO: finish this
+    console.log(data);
+
+    return pollToUpdate;
   }
 
   async getPollsByEmail(adminEmail: string): Promise<AdminPoll[]> {
