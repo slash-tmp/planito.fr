@@ -2,6 +2,7 @@
 import { sortBy } from "lodash-es";
 
 import Star from "~/components/icons/Star.vue";
+import UpdateVoteTooltip from "~/components/UpdateVoteTooltip.vue";
 import { type Respondent, Response } from "~/types/poll";
 
 import NeverAvailableRespondents from "../NeverAvailableRespondents.vue";
@@ -51,6 +52,17 @@ const neverAvailableRespondents = computed(() => {
     })
     .map((r) => r.name);
 });
+
+/**
+ * TODO:
+ * - plug api (if same value => do nothing, info toast?)
+ * - live refresh data after api call (recompute best choice)
+ * - success or error toast (+ locale strings)
+ * - reposition focus if new value is "no" (element does not exist anymore)
+ */
+function updateVote() {
+  console.log("update vote");
+}
 </script>
 
 <template>
@@ -100,6 +112,15 @@ const neverAvailableRespondents = computed(() => {
               <template v-if="respondent.value === Response.MAYBE">
                 {{ $t("pages.poll.admin.id.responses.maybe") }}
               </template>
+
+              <UpdateVoteTooltip
+                v-if="isAdmin"
+                :current-value="respondent.value"
+                :name="respondent.name"
+                :date="choice.date"
+                :time="time.time"
+                @submit="updateVote"
+              />
             </li>
           </ul>
         </li>

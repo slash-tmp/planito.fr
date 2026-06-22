@@ -227,6 +227,16 @@ export default {
             bestChoice: "Meilleur choix",
             neverAvailable:
               "A répondu mais n’est disponible à aucune date : | Ont répondu mais ne sont disponibles à aucune date :",
+            updateVote: {
+              button: "Modifier le vote de {name} pour le {date} à {time}",
+              label: "Vote de {name} pour le {date} à {time}",
+              choices: {
+                yes: "Oui",
+                maybe: "Peut-être",
+                no: "Non",
+              },
+              submit: "Valider la modification",
+            },
           },
           error: {
             404: {
