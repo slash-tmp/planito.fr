@@ -4,6 +4,8 @@ import { sortBy } from "lodash-es";
 import Star from "~/components/icons/Star.vue";
 import { type Respondent, Response } from "~/types/poll";
 
+import NeverAvailableRespondents from "../NeverAvailableRespondents.vue";
+
 const props = defineProps<{
   choices: { id: number; date: string }[];
   respondents: Respondent[];
@@ -104,26 +106,11 @@ const neverAvailableRespondents = computed(() => {
       </ul>
     </li>
   </ul>
-  <p v-if="neverAvailableRespondents.length" class="never-available">
-    {{
-      $t(
-        "pages.poll.admin.id.responses.neverAvailable",
-        neverAvailableRespondents.length,
-      )
-    }}
 
-    <template
-      v-for="(part, index) in formatList(neverAvailableRespondents, true)"
-      :key="index"
-    >
-      <strong v-if="part.type === 'element'">
-        {{ part.value }}
-      </strong>
-      <template v-else>
-        {{ part.value }}
-      </template> </template
-    >.
-  </p>
+  <NeverAvailableRespondents
+    v-if="neverAvailableRespondents.length"
+    :respondents="neverAvailableRespondents"
+  />
 </template>
 
 <style scoped>
@@ -230,9 +217,5 @@ const neverAvailableRespondents = computed(() => {
     border-style: dashed;
     background-color: var(--color-background);
   }
-}
-
-.never-available {
-  margin-block-start: 1rem;
 }
 </style>
