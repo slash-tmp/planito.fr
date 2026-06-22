@@ -28,7 +28,8 @@ export function formatList(
   items: string[],
   formatToParts = false,
 ): string | ListPart[] {
-  const formatter = new Intl.ListFormat("fr", {
+  const { locale } = useI18n();
+  const formatter = new Intl.ListFormat(locale.value, {
     type: "conjunction",
   });
 
