@@ -2,6 +2,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 
 import { AppModule } from './app.module';
@@ -24,6 +25,7 @@ async function bootstrap() {
   const isProductionEnv = config.get('NODE_ENV') === 'production';
 
   app.setGlobalPrefix('api');
+  app.use(cookieParser());
   app.use(morgan(isProductionEnv ? 'common' : 'dev'));
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 

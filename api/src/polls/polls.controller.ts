@@ -9,7 +9,9 @@ import {
   Param,
   Post,
   Put,
+  Res,
 } from '@nestjs/common';
+import { type Response } from 'express';
 
 import { AdminPoll } from './dto/admin-poll.dto';
 import { CreatePollDto } from './dto/create-poll.dto';
@@ -49,6 +51,7 @@ export class PollsController {
   async respondToPoll(
     @Param('public_uid') publicUid: string,
     @Body() body: RespondToPollDto,
+    @Res({ passthrough: true }) response: Response,
   ) {
     const poll = await this.pollsService.getPublicPoll(publicUid);
     if (!poll) {
@@ -60,6 +63,16 @@ export class PollsController {
         publicUid,
         body,
       );
+
+      // set edition cookie
+      const respondentToken = await this.pollsService.generateRespondentToken(
+        respondent.id,
+      );
+      response.cookie('vote_edition_token', respondentToken, {
+        // the cookie is active only for current poll
+        path: `/api/polls/${poll.id}`,
+      });
+
       if (poll.notifyOnResponse) {
         this.pollsService.sendNewResponseEmail(poll, respondent);
       }

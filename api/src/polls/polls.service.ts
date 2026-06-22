@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { sortBy, uniqBy } from 'lodash';
 
 import { MailerService } from '../mailer/mailer.service';
@@ -23,6 +24,7 @@ export class PollsService {
     private readonly pollRepository: PollRepository,
     private readonly mailerService: MailerService,
     private readonly config: ConfigService,
+    private readonly jwt: JwtService,
   ) {}
 
   async createPoll(data: CreatePollDto): Promise<AdminPoll> {
@@ -230,5 +232,9 @@ Pour accéder à toutes les réponses de ce sondage, vous pouvez utiliser le lie
     });
 
     await this.mailerService.sendEmail(poll.adminEmail, subject, text, html);
+  }
+
+  generateRespondentToken(respondentId: number): Promise<string> {
+    return this.jwt.signAsync({ sub: respondentId });
   }
 }
