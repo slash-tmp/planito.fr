@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
+import { ConfigType } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { nanoid } from 'nanoid';
 
+import authConfig from '../config/auth.config';
 import { MailerModule } from '../mailer/mailer.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { PrismaService } from '../prisma/prisma.service';
@@ -27,7 +30,16 @@ const pollRepositoryProvider = {
 };
 
 @Module({
-  imports: [PrismaModule, MailerModule],
+  imports: [
+    PrismaModule,
+    MailerModule,
+    JwtModule.registerAsync({
+      useFactory: async (config: ConfigType<typeof authConfig>) => ({
+        secret: config.jwtSecret,
+      }),
+      inject: [authConfig.KEY],
+    }),
+  ],
   controllers: [PollsController],
   providers: [
     PollsService,

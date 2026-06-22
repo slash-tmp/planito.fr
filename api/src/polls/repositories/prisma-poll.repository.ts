@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../prisma/prisma.service';
 import { UidGenerator } from '../../uid-generator';
 import { CreatePollDto } from '../dto/create-poll.dto';
 import { RespondToPollDto } from '../dto/respond-to-poll.dto';
 import { UpdatePollDto } from '../dto/update-poll.dto';
+import { UpdateResponseDto } from '../dto/update-response.dto';
 import { PublicPollNotFoundError } from '../errors/public-poll-not-found.error';
 import { Poll, PollRepository, Respondent } from './poll.repository';
 
@@ -95,7 +96,10 @@ export class PrismaPollRepository implements PollRepository {
       return deletedPoll;
     } catch (e) {
       // record not found
-      if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2025'
+      ) {
         return null;
       }
       throw e;
@@ -166,7 +170,49 @@ export class PrismaPollRepository implements PollRepository {
 
       return respondent;
     } catch (e) {
-      if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2025'
+      ) {
+        throw new PublicPollNotFoundError(publicUid);
+      }
+      throw e;
+    }
+  }
+
+  public async updateRespondent(
+    publicUid: string,
+    respondentId: number,
+    response: UpdateResponseDto,
+  ): Promise<Respondent> {
+    try {
+      await this.prisma.$transaction(
+        response.responses.map((r) =>
+          this.prisma.response.upsert({
+            where: {
+              choiceId_respondentId: {
+                choiceId: r.choiceId,
+                respondentId: respondentId,
+              },
+            },
+            update: { value: r.value },
+            create: {
+              respondentId: respondentId,
+              choiceId: r.choiceId,
+              value: r.value,
+            },
+          }),
+        ),
+      );
+      return this.prisma.respondent.findFirstOrThrow({
+        where: { id: respondentId },
+        include: { responses: true },
+      });
+    } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2025'
+      ) {
         throw new PublicPollNotFoundError(publicUid);
       }
       throw e;

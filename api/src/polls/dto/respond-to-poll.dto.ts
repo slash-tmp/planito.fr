@@ -15,7 +15,7 @@ export enum RespondToPollDtoResponseValue {
   MAYBE = 'MAYBE',
 }
 
-class RespondToPollDtoResponse {
+export class RespondToPollDtoResponse {
   @IsInt()
   choiceId: number;
 

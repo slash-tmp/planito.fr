@@ -1,21 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { sortBy, uniqBy } from 'lodash';
 
 import { MailerService } from '../mailer/mailer.service';
 import { AdminPoll } from './dto/admin-poll.dto';
 import { CreatePollDto } from './dto/create-poll.dto';
 import { PublicPoll } from './dto/public-poll.dto';
-import { RespondToPollDto } from './dto/respond-to-poll.dto';
+import {
+  RespondToPollDto,
+  RespondToPollDtoResponse,
+} from './dto/respond-to-poll.dto';
 import { UpdatePollDto, UpdatePollDtoChoice } from './dto/update-poll.dto';
+import { UpdateResponseDto } from './dto/update-response.dto';
 import { ChoiceDoesNotExistError } from './errors';
 import { CannotChangeChoiceDateError } from './errors/cannot-change-choice-date.error';
 import { DuplicateChoiceResponseError } from './errors/duplicate-choice-response.error';
 import {
+  Poll,
   Poll as RawPoll,
   PollRepository,
   Respondent,
 } from './repositories/poll.repository';
+import { RespondentJwtPayload } from './respondent-jwt-payload';
 
 @Injectable()
 export class PollsService {
@@ -23,6 +30,7 @@ export class PollsService {
     private readonly pollRepository: PollRepository,
     private readonly mailerService: MailerService,
     private readonly config: ConfigService,
+    private readonly jwt: JwtService,
   ) {}
 
   async createPoll(data: CreatePollDto): Promise<AdminPoll> {
@@ -195,22 +203,47 @@ ${sortedPolls.map(getPollLine).join('\n')}`;
       throw new Error('Poll not found');
     }
 
+    this.validateResponses(poll, body.responses);
+
+    const respondent = await this.pollRepository.addRespondent(publicUid, body);
+
+    return { poll, respondent };
+  }
+
+  async updateResponseToPoll(
+    publicUid: string,
+    respondentId: number,
+    body: UpdateResponseDto,
+  ) {
+    const poll = await this.pollRepository.findByPublicUid(publicUid);
+    if (!poll) {
+      throw new Error('Poll not found');
+    }
+
+    this.validateResponses(poll, body.responses);
+
+    const respondent = await this.pollRepository.updateRespondent(
+      publicUid,
+      respondentId,
+      body,
+    );
+
+    return { poll, respondent };
+  }
+
+  private validateResponses(poll: Poll, responses: RespondToPollDtoResponse[]) {
     // Check only choices from poll are present
     const availableChoiceIds = poll.choices.map((choice) => choice.id);
-    body.responses.forEach((response) => {
+    responses.forEach((response) => {
       if (!availableChoiceIds.includes(response.choiceId)) {
         throw new ChoiceDoesNotExistError(response.choiceId);
       }
     });
 
     // Check there are no duplicate choices
-    if (uniqBy(body.responses, 'choiceId').length !== body.responses.length) {
+    if (uniqBy(responses, 'choiceId').length !== responses.length) {
       throw new DuplicateChoiceResponseError();
     }
-
-    const respondent = await this.pollRepository.addRespondent(publicUid, body);
-
-    return { poll, respondent };
   }
 
   async sendNewResponseEmail(poll: RawPoll, respondent: Respondent) {
@@ -230,5 +263,10 @@ Pour accéder à toutes les réponses de ce sondage, vous pouvez utiliser le lie
     });
 
     await this.mailerService.sendEmail(poll.adminEmail, subject, text, html);
+  }
+
+  generateRespondentToken(respondentId: number): Promise<string> {
+    const payload: RespondentJwtPayload = { sub: respondentId };
+    return this.jwt.signAsync(payload);
   }
 }

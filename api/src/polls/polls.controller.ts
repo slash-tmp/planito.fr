@@ -9,17 +9,24 @@ import {
   Param,
   Post,
   Put,
+  Req,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
+import { Request, type Response } from 'express';
 
+import { RESPONDENT_COOKIE } from './constants';
 import { AdminPoll } from './dto/admin-poll.dto';
 import { CreatePollDto } from './dto/create-poll.dto';
 import { PublicPoll } from './dto/public-poll.dto';
 import { RespondToPollDto } from './dto/respond-to-poll.dto';
 import { SearchPollsDto } from './dto/search-polls.dto';
 import { UpdatePollDto } from './dto/update-poll.dto';
+import { UpdateResponseDto } from './dto/update-response.dto';
 import { ChoiceDoesNotExistError } from './errors';
 import { CannotChangeChoiceDateError } from './errors/cannot-change-choice-date.error';
 import { PollsService } from './polls.service';
+import { RespondentGuard } from './respondent.guard';
 
 @Controller('polls')
 export class PollsController {
@@ -49,6 +56,7 @@ export class PollsController {
   async respondToPoll(
     @Param('public_uid') publicUid: string,
     @Body() body: RespondToPollDto,
+    @Res({ passthrough: true }) response: Response,
   ) {
     const poll = await this.pollsService.getPublicPoll(publicUid);
     if (!poll) {
@@ -60,8 +68,49 @@ export class PollsController {
         publicUid,
         body,
       );
+
+      // set edition cookie
+      const respondentToken = await this.pollsService.generateRespondentToken(
+        respondent.id,
+      );
+      response.cookie(RESPONDENT_COOKIE, respondentToken, {
+        // the cookie is active only for current poll
+        path: `/api/polls/${poll.publicUid}`,
+      });
+
       if (poll.notifyOnResponse) {
         this.pollsService.sendNewResponseEmail(poll, respondent);
+      }
+    } catch (e) {
+      if (e instanceof ChoiceDoesNotExistError) {
+        throw new BadRequestException(e.message, { cause: e });
+      }
+      throw e;
+    }
+  }
+
+  @Put(':public_uid/responses')
+  @UseGuards(RespondentGuard)
+  async updateResponse(
+    @Param('public_uid') publicUid: string,
+    @Body() body: UpdateResponseDto,
+    @Req() req: Request,
+  ) {
+    const poll = await this.pollsService.getPublicPoll(publicUid);
+    if (!poll) {
+      throw new NotFoundException();
+    }
+
+    try {
+      const { poll } = await this.pollsService.updateResponseToPoll(
+        publicUid,
+        req.respondentId!,
+        body,
+      );
+
+      if (poll.notifyOnResponse) {
+        // TODO: vote update mail
+        //this.pollsService.sendNewResponseEmail(poll, respondent);
       }
     } catch (e) {
       if (e instanceof ChoiceDoesNotExistError) {
