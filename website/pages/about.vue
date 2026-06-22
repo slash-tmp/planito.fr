@@ -95,7 +95,13 @@
     </template>
   </i18n-t>
 
-  <p>{{ $t("pages.about.contact.2") }}</p>
+  <i18n-t tag="p" keypath="pages.about.contact.2">
+    <template #changelog>
+      <a href="https://github.com/slash-tmp/planito.fr/blob/main/CHANGELOG.md">
+        {{ $t("pages.about.contact.changelog") }}
+      </a>
+    </template>
+  </i18n-t>
 
   <p>{{ $t("pages.about.contact.3") }}</p>
 </template>
