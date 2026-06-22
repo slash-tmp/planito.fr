@@ -4,6 +4,7 @@ import { UidGenerator } from '../../uid-generator';
 import { CreatePollDto } from '../dto/create-poll.dto';
 import { RespondToPollDto } from '../dto/respond-to-poll.dto';
 import { UpdatePollDto } from '../dto/update-poll.dto';
+import { UpdateResponseDto } from '../dto/update-response.dto';
 import { PublicPollNotFoundError } from '../errors/public-poll-not-found.error';
 import { Poll, PollRepository, Respondent } from './poll.repository';
 
@@ -138,5 +139,46 @@ export class InMemoryPollRepository implements PollRepository {
     pollToUpdate.respondents.push(respondent);
 
     return Promise.resolve(respondent);
+  }
+
+  public updateRespondent(
+    publicUid: string,
+    respondentId: number,
+    response: UpdateResponseDto,
+  ): Promise<Respondent> {
+    const pollToUpdate = this.polls.find((p) => p.publicUid === publicUid);
+
+    if (!pollToUpdate) {
+      throw new PublicPollNotFoundError(publicUid);
+    }
+
+    const respondentToUpdate = pollToUpdate.respondents.find(
+      (r) => r.id === respondentId,
+    );
+
+    if (!respondentToUpdate) {
+      // FIXME: make a new error RespondentNotFoundError ?
+      throw new PublicPollNotFoundError(publicUid);
+    }
+
+    response.responses.forEach((update) => {
+      const existingResponse = respondentToUpdate.responses.find(
+        (existing) => existing.id === update.choiceId,
+      );
+      if (existingResponse) {
+        existingResponse.value = update.value;
+        existingResponse.updatedAt = new Date();
+      } else {
+        respondentToUpdate.responses.push({
+          id: this.nextId++,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          choiceId: update.choiceId,
+          value: update.value,
+        });
+      }
+    });
+
+    return Promise.resolve(respondentToUpdate);
   }
 }
