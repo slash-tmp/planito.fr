@@ -227,7 +227,7 @@ export default {
             bestChoice: "Meilleur choix",
             neverAvailable:
               "A répondu mais n’est disponible à aucune date : | Ont répondu mais ne sont disponibles à aucune date :",
-            updateVote: {
+            updateResponse: {
               button: "Modifier le vote de {name} pour le {date} à {time}",
               label: "Vote de {name} pour le {date} à {time}",
               choices: {
@@ -236,6 +236,9 @@ export default {
                 no: "Non",
               },
               submit: "Valider la modification",
+              successAlert: "La réponse a bien été modifiée.",
+              errorAlert:
+                "Un problème empêche la modification de la réponse. Contactez-nous à l’adresse @:email si le problème persiste.",
             },
           },
           error: {

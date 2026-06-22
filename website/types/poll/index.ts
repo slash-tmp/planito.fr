@@ -25,6 +25,12 @@ export interface UpdatePollFormData {
   adminName: string | null;
 }
 
+export interface UpdatePollResponseFormData {
+  choiceId: number;
+  respondentId: number;
+  value: Response;
+}
+
 export interface VotePollFormData {
   respondentName: string;
   responses: { choiceId: number; value: Response }[];
@@ -48,6 +54,8 @@ export type UpdatePollApiRequest =
   paths["/polls/admin/{admin_uid}"]["put"]["requestBody"]["content"]["application/json"];
 export type UpdatePollApiResponse =
   paths["/polls/admin/{admin_uid}"]["put"]["responses"]["200"]["content"]["application/json"];
+export type UpdatePollResponseApiResponse =
+  paths["/polls/admin/{admin_uid}/vote"]["put"]["responses"]["200"]["content"]["application/json"];
 
 // Misc
 export enum Response {

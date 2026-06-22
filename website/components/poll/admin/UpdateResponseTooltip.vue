@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { useId } from "vue";
 
-/**
- * TODO:
- * - use icons instead of emojis
- * - style toggle button
- */
+import Check from "~/components/icons/Check.vue";
+import Pen from "~/components/icons/Pen.vue";
+import { Response } from "~/types/poll";
 
 const props = defineProps<{
   currentValue?: string;
@@ -20,6 +18,12 @@ const emit = defineEmits<{
 
 const uniqueId = useId();
 
+const options = [
+  { value: Response.YES, key: "yes" },
+  { value: Response.MAYBE, key: "maybe" },
+  { value: Response.NO, key: "no" },
+];
+
 const showTooltip = ref(false);
 function toggleTooltip() {
   showTooltip.value = !showTooltip.value;
@@ -27,7 +31,7 @@ function toggleTooltip() {
 
 const toggleButtonRef = useTemplateRef("toggleButtonRef");
 
-function closeTooltip() {
+function handleOnEscape() {
   showTooltip.value = false;
   toggleButtonRef.value?.focus();
 }
@@ -35,11 +39,8 @@ function closeTooltip() {
 const vote = ref(props.currentValue);
 
 function editVote() {
-  console.log(
-    `update vote of ${props.name} to ${vote.value} for ${props.date}`,
-  );
   emit("submit", vote.value);
-  closeTooltip();
+  showTooltip.value = false;
 }
 
 // Handle click outside of the tooltip to close it
@@ -64,12 +65,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="wrapperRef" class="wrapper" @keydown.esc="closeTooltip">
-    <button ref="toggleButtonRef" @click="toggleTooltip">
-      ✏️
+  <div ref="wrapperRef" class="wrapper" @keydown.esc="handleOnEscape">
+    <button ref="toggleButtonRef" class="toggle-button" @click="toggleTooltip">
+      <Pen class="toggle-icon" />
       <span class="visually-hidden">
         {{
-          $t("pages.poll.admin.id.responses.updateVote.button", {
+          $t("pages.poll.admin.id.responses.updateResponse.button", {
             name,
             date,
             time,
@@ -81,7 +82,7 @@ onUnmounted(() => {
     <form v-if="showTooltip" class="tooltip" @submit.prevent="editVote">
       <label :for="`edit-vote-${uniqueId}`" class="visually-hidden">
         {{
-          $t("pages.poll.admin.id.responses.updateVote.label", {
+          $t("pages.poll.admin.id.responses.updateResponse.label", {
             name,
             date,
             time,
@@ -94,20 +95,23 @@ onUnmounted(() => {
         required
         class="vote-select"
       >
-        <option value="YES">
-          {{ $t("pages.poll.admin.id.responses.updateVote.choices.yes") }}
-        </option>
-        <option value="MAYBE">
-          {{ $t("pages.poll.admin.id.responses.updateVote.choices.maybe") }}
-        </option>
-        <option value="NO">
-          {{ $t("pages.poll.admin.id.responses.updateVote.choices.no") }}
+        <option
+          v-for="option in options"
+          :key="option.value"
+          :value="option.value"
+          :disabled="currentValue === option.value"
+        >
+          {{
+            $t(
+              `pages.poll.admin.id.responses.updateResponse.choices.${option.key}`,
+            )
+          }}
         </option>
       </select>
       <button type="submit" class="submit-button">
-        ok
+        <Check />
         <span class="visually-hidden">
-          {{ $t("pages.poll.admin.id.responses.updateVote.submit") }}
+          {{ $t("pages.poll.admin.id.responses.updateResponse.submit") }}
         </span>
       </button>
     </form>
@@ -118,6 +122,16 @@ onUnmounted(() => {
 .wrapper {
   display: inline-block;
   position: relative;
+}
+
+.toggle-button {
+  background: none;
+  border: none;
+  border-radius: var(--border-radius-base);
+  color: var(--color-foreground);
+  padding: 0;
+  width: 1rem;
+  display: flex;
 }
 
 .tooltip {
@@ -163,5 +177,18 @@ onUnmounted(() => {
   box-shadow: var(--shadow-small);
   background-color: var(--color-primary);
   color: var(--color-background);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+
+  &:hover {
+    background-color: var(--color-primary-darker);
+    border-color: var(--color-primary-darker);
+  }
+
+  svg {
+    width: 1rem;
+  }
 }
 </style>
