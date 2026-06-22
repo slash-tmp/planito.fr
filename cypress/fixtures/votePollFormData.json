@@ -28,6 +28,20 @@
     ]
   },
   {
+    "name": "Marie",
+    "responses": [
+      {
+        "value": "NO"
+      },
+      {
+        "value": "NO"
+      },
+      {
+        "value": "NO"
+      }
+    ]
+  },
+  {
     "name": "Michel",
     "responses": [
       {

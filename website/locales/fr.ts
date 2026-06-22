@@ -225,6 +225,8 @@ export default {
             vote: "vote | votes",
             maybe: "(peut-être)",
             bestChoice: "Meilleur choix",
+            neverAvailable:
+              "A répondu mais n’est disponible à aucune date : | Ont répondu mais ne sont disponibles à aucune date :",
           },
           error: {
             404: {

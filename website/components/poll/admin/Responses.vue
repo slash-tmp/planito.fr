@@ -4,9 +4,12 @@ import { sortBy } from "lodash-es";
 import Star from "~/components/icons/Star.vue";
 import { type Respondent, Response } from "~/types/poll";
 
+import NeverAvailableRespondents from "../NeverAvailableRespondents.vue";
+
 const props = defineProps<{
   choices: { id: number; date: string }[];
   respondents: Respondent[];
+  isAdmin?: boolean;
 }>();
 
 const choicesWithRespondents = computed(() =>
@@ -37,6 +40,16 @@ const maxVotesResponseIds = computed((): number[] => {
       : r["MAYBE"] === firstBestResponse["MAYBE"],
   );
   return bestResponses.map((r) => r.id);
+});
+
+const neverAvailableRespondents = computed(() => {
+  return props.respondents
+    .filter((r) => {
+      return r.responses.every((re) => {
+        return re.value === Response.NO;
+      });
+    })
+    .map((r) => r.name);
 });
 </script>
 
@@ -93,6 +106,11 @@ const maxVotesResponseIds = computed((): number[] => {
       </ul>
     </li>
   </ul>
+
+  <NeverAvailableRespondents
+    v-if="neverAvailableRespondents.length"
+    :respondents="neverAvailableRespondents"
+  />
 </template>
 
 <style scoped>

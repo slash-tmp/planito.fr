@@ -8,6 +8,8 @@ import Radio from "~/components/Radio.vue";
 import type { Respondent, VotePollFormData } from "~/types/poll";
 import { Response } from "~/types/poll";
 
+import NeverAvailableRespondents from "../NeverAvailableRespondents.vue";
+
 const responseIcon = {
   [Response.YES]: Check,
   [Response.MAYBE]: QuestionMark,
@@ -37,6 +39,16 @@ const attendances = ref(
 const choicesWithRespondents = computed(() =>
   getPublicChoicesWithRespondents(props.choices, props.respondents),
 );
+
+const neverAvailableRespondents = computed(() => {
+  return props.respondents
+    ?.filter((r) => {
+      return r.responses.every((re) => {
+        return re.value === Response.NO;
+      });
+    })
+    .map((r) => r.name);
+});
 
 function getAttendanceForDate(id: number) {
   return attendances.value.find((a) => a.id === id)!.attendance;
@@ -154,6 +166,11 @@ function submitVote() {
       </li>
     </ul>
 
+    <NeverAvailableRespondents
+      v-if="neverAvailableRespondents?.length"
+      :respondents="neverAvailableRespondents"
+    />
+
     <Button type="submit" class="submit-button" :is-loading="isLoading">
       {{ $t("pages.poll.id.form.submit") }}
     </Button>
@@ -173,7 +190,7 @@ function submitVote() {
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  margin-block-end: 2rem;
+  margin-block-end: 1rem;
 
   @media (width < 30rem) {
     gap: 1rem;
@@ -269,5 +286,6 @@ fieldset {
 .submit-button {
   display: flex;
   margin-inline-start: auto;
+  margin-block-start: 1rem;
 }
 </style>
