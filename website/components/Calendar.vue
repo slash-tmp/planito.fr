@@ -6,6 +6,8 @@ import ChevronRight from "~/components/icons/ChevronRight.vue";
 import Xmark from "~/components/icons/Xmark.vue";
 import Input from "~/components/Input.vue";
 
+import Checkbox from "./Checkbox.vue";
+
 const modelValue = defineModel<{ id?: number; date: string; time: string }[]>({
   required: true,
 });
@@ -108,7 +110,7 @@ const monthDays = computed(() => {
   return result;
 });
 
-// // Handle selected dates
+// Handle selected dates
 const choicesWithId = ref(
   modelValue.value.map((choice) => ({
     id: choice.id,
@@ -272,6 +274,8 @@ const nextDatesCount = computed((): string => {
 
   return "";
 });
+
+const hasSameTimes = ref(false);
 </script>
 
 <template>
@@ -351,58 +355,82 @@ const nextDatesCount = computed((): string => {
     </div>
 
     <!-- Times -->
-    <ul class="choices-times">
-      <li
-        v-for="(dateChoices, date) in groupBy(sortedChoices, 'date')"
-        :key="date"
-        class="time-container"
-      >
-        <fieldset>
-          <legend>{{ formatDate(date as string) }}</legend>
-          <div
-            v-for="(choice, j) in dateChoices"
-            :key="choice.localId"
-            class="time-input-wrapper"
-          >
-            <Input
-              :id="`time-${date}-${j.toString().padStart(2, '0')}`"
-              ref="timeInputRefs"
-              v-model="choice.time"
-              type="time"
-              :label="
-                $t('pages.poll.new.choices.choice.timeLabel', {
-                  index: j + 1,
-                })
-              "
-              :readonly="!!choice.id"
-            />
-            <Button
-              v-if="dateChoices.length > 1"
-              variant="secondary"
-              class="time-delete-button"
-              @click="deleteTime(date as string, choice.localId)"
+    <div class="choices-times">
+      <Checkbox
+        v-if="sortedChoices.length"
+        id="apply-same-times"
+        v-model="hasSameTimes"
+        :label="$t('pages.poll.new.choices.hasSameTimes.label')"
+        :help="$t('pages.poll.new.choices.hasSameTimes.help')"
+      />
+
+      <ul>
+        <li
+          v-for="(dateChoices, date, i) in groupBy(sortedChoices, 'date')"
+          :key="date"
+          class="time-container"
+        >
+          <fieldset>
+            <component
+              :is="!hasSameTimes || i === 0 ? 'legend' : 'p'"
+              class="time-container-legend"
             >
-              <Xmark />
-              <span class="visually-hidden">Supprimer</span>
-            </Button>
-          </div>
-          <Button
-            type="button"
-            variant="tertiary"
-            @click="addTime(date as string)"
-          >
-            {{ $t("pages.poll.new.choices.choice.addTime") }}
-            <span class="visually-hidden">
-              {{
-                $t("pages.poll.new.choices.choice.forTheDate", {
-                  date: formatDate(date as string),
-                })
-              }}
-            </span>
-          </Button>
-        </fieldset>
-      </li>
-    </ul>
+              {{ formatDate(date as string) }}
+            </component>
+
+            <template v-if="!hasSameTimes || i === 0">
+              <div
+                v-for="(choice, j) in dateChoices"
+                :key="choice.localId"
+                class="time-input-wrapper"
+              >
+                <Input
+                  :id="`time-${date}-${j.toString().padStart(2, '0')}`"
+                  ref="timeInputRefs"
+                  v-model="choice.time"
+                  type="time"
+                  :label="
+                    $t('pages.poll.new.choices.choice.timeLabel', {
+                      index: j + 1,
+                    })
+                  "
+                  :readonly="!!choice.id"
+                />
+                <Button
+                  v-if="dateChoices.length > 1"
+                  variant="secondary"
+                  class="time-delete-button"
+                  @click="deleteTime(date as string, choice.localId)"
+                >
+                  <Xmark class="time-delete-icon" />
+                  <span class="visually-hidden">
+                    {{ $t("pages.poll.new.choices.choice.deleteChoice") }}
+                  </span>
+                </Button>
+              </div>
+              <Button
+                type="button"
+                variant="tertiary"
+                class="time-add-button"
+                @click="addTime(date as string)"
+              >
+                {{ $t("pages.poll.new.choices.choice.addTime") }}
+                <span class="visually-hidden">
+                  {{
+                    $t("pages.poll.new.choices.choice.forTheDate", {
+                      date: formatDate(date as string),
+                    })
+                  }}
+                </span>
+              </Button>
+            </template>
+            <p v-else class="same-times-notice">
+              {{ $t("pages.poll.new.choices.choice.hasSameTimes") }}
+            </p>
+          </fieldset>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -532,9 +560,15 @@ const nextDatesCount = computed((): string => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  list-style: none;
-  padding: 0;
-  margin: 0;
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
 
   .time-container {
     padding: 1rem;
@@ -544,18 +578,17 @@ const nextDatesCount = computed((): string => {
 
     fieldset {
       border: none;
-      display: flex;
-      flex-direction: column;
-      align-items: start;
-      gap: 1rem;
+      padding: 0;
+      margin: 0;
     }
 
-    legend {
+    .time-container-legend {
       font-size: var(--font-size-2);
       font-weight: var(--font-weight-semibold);
     }
 
     .time-input-wrapper {
+      margin-block-start: 1rem;
       display: flex;
       align-items: end;
       gap: 0.5rem;
@@ -567,7 +600,22 @@ const nextDatesCount = computed((): string => {
         width: var(--delete-button-size);
         height: var(--delete-button-size);
       }
+
+      .time-delete-icon {
+        width: 1rem;
+      }
     }
+
+    .time-add-button {
+      margin-block-start: 1rem;
+    }
+  }
+
+  .same-times-notice {
+    color: var(--color-grey-3);
+    font-size: var(--font-size-0);
+    font-style: italic;
+    margin-block-start: 0.5rem;
   }
 }
 </style>
