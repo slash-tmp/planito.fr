@@ -142,6 +142,10 @@ export default {
           stepTitle: "Dates et horaires",
           intro:
             "Maintenant, faites votre sélection de dates : chaque date doit avoir au moins un horaire associé et votre sondage doit au moins proposer une date (ça va de soi non ?).",
+          hasSameTimes: {
+            label: "Mêmes horaires pour chaque date",
+            help: "À partir des horaires de la première date du sondage.",
+          },
           noChoiceError:
             "Vous devez ajouter au moins une date à votre sondage.",
           previous: "Mois précédent",
@@ -151,6 +155,8 @@ export default {
             deleteChoice: "Supprimer",
             addTime: "Ajouter un horaire",
             forTheDate: "pour le {date}",
+            hasSameTimes:
+              "Mêmes horaires que pour la première date du sondage.",
           },
         },
         settings: {
