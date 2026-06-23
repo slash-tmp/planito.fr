@@ -1,15 +1,25 @@
 <script setup lang="ts">
 import { sortBy } from "lodash-es";
+import { computed } from "vue";
 
 import Star from "~/components/icons/Star.vue";
-import { type Respondent, Response } from "~/types/poll";
+import {
+  type Respondent,
+  Response,
+  type UpdatePollResponseFormData,
+} from "~/types/poll";
 
 import NeverAvailableRespondents from "../NeverAvailableRespondents.vue";
+import UpdateResponseTooltip from "./UpdateResponseTooltip.vue";
 
 const props = defineProps<{
   choices: { id: number; date: string }[];
   respondents: Respondent[];
   isAdmin?: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: "updateResponse", payload: UpdatePollResponseFormData): void;
 }>();
 
 const choicesWithRespondents = computed(() =>
@@ -51,6 +61,21 @@ const neverAvailableRespondents = computed(() => {
     })
     .map((r) => r.name);
 });
+
+/**
+ * TODO:
+ * - plug api (if same value => do nothing, info toast?)
+ * - live refresh data after api call (recompute best choice)
+ * - success or error toast (+ locale strings)
+ * - reposition focus if new value is "no" (element does not exist anymore)
+ */
+async function updateResponse(
+  choiceId: number,
+  respondentId: number,
+  value?: string,
+) {
+  emit("updateResponse", { choiceId, respondentId, value });
+}
 </script>
 
 <template>
@@ -100,6 +125,15 @@ const neverAvailableRespondents = computed(() => {
               <template v-if="respondent.value === Response.MAYBE">
                 {{ $t("pages.poll.admin.id.responses.maybe") }}
               </template>
+
+              <UpdateResponseTooltip
+                v-if="isAdmin"
+                :current-value="respondent.value"
+                :name="respondent.name"
+                :date="choice.date"
+                :time="time.time"
+                @submit="updateResponse(time.id, respondent.id, $event)"
+              />
             </li>
           </ul>
         </li>
@@ -212,6 +246,9 @@ const neverAvailableRespondents = computed(() => {
   border: 1px solid var(--color-success);
   background-color: var(--color-success-light);
   padding: 0.25rem 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 
   &.maybe {
     border-style: dashed;

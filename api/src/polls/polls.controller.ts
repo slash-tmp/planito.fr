@@ -17,6 +17,7 @@ import { PublicPoll } from './dto/public-poll.dto';
 import { RespondToPollDto } from './dto/respond-to-poll.dto';
 import { SearchPollsDto } from './dto/search-polls.dto';
 import { UpdatePollDto } from './dto/update-poll.dto';
+import { UpdatePollResponseDto } from './dto/update-poll-response.dto';
 import { ChoiceDoesNotExistError } from './errors';
 import { CannotChangeChoiceDateError } from './errors/cannot-change-choice-date.error';
 import { PollsService } from './polls.service';
@@ -98,6 +99,29 @@ export class PollsController {
       if (!poll) {
         throw new NotFoundException();
       }
+      return poll;
+    } catch (e) {
+      if (
+        e instanceof ChoiceDoesNotExistError ||
+        e instanceof CannotChangeChoiceDateError
+      ) {
+        throw new BadRequestException(e.message, { cause: e });
+      }
+      throw e;
+    }
+  }
+
+  @Put('admin/:admin_uid/choices')
+  async updatePollVote(
+    @Param('admin_uid') adminUid: string,
+    @Body() body: UpdatePollResponseDto,
+  ): Promise<AdminPoll> {
+    try {
+      const poll = await this.pollsService.updatePollResponse(adminUid, body);
+      if (!poll) {
+        throw new NotFoundException();
+      }
+
       return poll;
     } catch (e) {
       if (

@@ -14,6 +14,8 @@ import {
   type UpdatePollApiRequest,
   type UpdatePollApiResponse,
   type UpdatePollFormData,
+  type UpdatePollResponseApiResponse,
+  type UpdatePollResponseFormData,
   type VotePollFormData,
 } from "~/types/poll";
 
@@ -82,6 +84,21 @@ export async function updatePoll(
   return data;
 }
 
+export async function updatePollResponse(
+  adminUid: string,
+  formData: UpdatePollResponseFormData,
+) {
+  const data = await $fetch<UpdatePollResponseApiResponse>(
+    `/api/polls/admin/${adminUid}/vote`,
+    {
+      method: "PUT",
+      body: formData,
+    },
+  );
+
+  return data;
+}
+
 /** Delete a poll and return it */
 export async function deletePoll(adminUid: string) {
   const deletedPoll = await $fetch<AdminPollApiResponse>(
@@ -139,6 +156,7 @@ export function getPublicChoicesWithRespondents(
             })
             .map((r) => {
               return {
+                id: r.id,
                 name: r.name,
                 value: r.responses.find((r) => r.choiceId === c.id)?.value,
               };

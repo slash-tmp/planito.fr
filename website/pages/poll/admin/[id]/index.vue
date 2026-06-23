@@ -6,7 +6,10 @@ import Intro from "~/components/poll/admin/Intro.vue";
 import Responses from "~/components/poll/admin/Responses.vue";
 import Share from "~/components/poll/admin/Share.vue";
 import useToast from "~/composables/useToast";
-import type { AdminPollApiResponse } from "~/types/poll";
+import type {
+  AdminPollApiResponse,
+  UpdatePollResponseFormData,
+} from "~/types/poll";
 
 const { t } = useI18n();
 
@@ -70,6 +73,36 @@ async function confirmDelete() {
     console.error(e);
   }
 }
+
+/**
+ * TODO:
+ * - live refresh data after api call (use useFetch 'refresh'?)
+ * - reposition focus:
+ *  - more precise: on `.respondent` item at correct id (and previous if doesnt exist anymore and `.time` if none)
+ *  - easier: on `.time` (always here)
+ */
+async function updateResponse(formData: UpdatePollResponseFormData) {
+  console.log(
+    `update vote of respondent ${formData.respondentId} to ${formData.value} for choice ${formData.choiceId}`,
+  );
+  try {
+    if (poll.value) {
+      await updatePollResponse(poll.value.adminUid, formData);
+      setToast({
+        title: t("pages.poll.admin.id.responses.updateResponse.successAlert"),
+        type: "success",
+        isClosable: true,
+      });
+    }
+  } catch (e) {
+    setToast({
+      title: t("pages.poll.admin.id.responses.updateResponse.errorAlert"),
+      type: "error",
+      isClosable: true,
+    });
+    console.error(e);
+  }
+}
 </script>
 
 <template>
@@ -114,6 +147,7 @@ async function confirmDelete() {
       is-admin
       :choices="poll.choices"
       :respondents="poll.respondents"
+      @update-response="updateResponse"
     />
   </template>
 </template>
